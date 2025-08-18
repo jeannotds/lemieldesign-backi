@@ -1,6 +1,16 @@
+import { IsEmail, IsString, Matches, MinLength } from "class-validator";
+
 export class CreateUserDto {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
-  readonly password: string;
+  @IsString()
+  name: string;
+  
+  @IsEmail({}, { message: 'Email invalide' })
+  email: string;
+  
+  @MinLength(8, { message: 'Le mot de passe doit avoir au moins 8 caractères' })
+  @Matches(/^(?=.*[0-9])(?=.*[!@#$%^&*])/, {
+    message: 'Le mot de passe doit contenir au moins un chiffre et un caractère spécial',
+  })
+  password: string;
+  // readonly password: string;
 }
