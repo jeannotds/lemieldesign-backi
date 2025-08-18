@@ -5,19 +5,34 @@ import { Model } from 'mongoose';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
 
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>){}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>, 
+  private jwtService: JwtService,
+){}
 
 
   async createUser(createUserDto: CreateUserDto){
     const saltOrRounds = 10;
     const hashPassword = await bcrypt.hash(createUserDto.password, saltOrRounds);  
-    
-    const createUser = new this.userModel({...createUserDto, password: hashPassword });
-    return createUser.save()
+
+    const newUser = new this.userModel({ ...createUserDto, password: hashPassword });
+
+    const savedUser = await newUser.save();
+
+    const token = this.jwtService.sign({ sub: savedUser._id, email: savedUser.email });
+
+    const { password, ...userWithoutPassword } = savedUser.toObject();
+
+    return {
+      access_token: token,
+      user: userWithoutPassword,
+    };
+
+
   }
 
   async loginUser(loginUserDto: LoginUserDto) {
@@ -30,11 +45,15 @@ export class UsersService {
 
       if(!isMatch) throw new UnauthorizedException('Mail ou Mot de passe Incorrect');
 
-       const {password, ...userWithoutPassword } = findUser.toObject();
+      const token = this.jwtService.sign({ sub: findUser._id, email: findUser.email });
 
-      return userWithoutPassword;
+      const {password, ...userWithoutPassword } = findUser.toObject();
 
-    }
+      return {
+          access_token: token,
+          user: userWithoutPassword,
+        };
+      }
 
 
 }
