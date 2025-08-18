@@ -15,8 +15,6 @@ export class UsersService {
     const saltOrRounds = 10;
     const hashPassword = await bcrypt.hash(createUserDto.password, saltOrRounds);  
     
-    console.log('hashPassword : ', hashPassword)
-
     const createUser = new this.userModel({...createUserDto, password: hashPassword });
     return createUser.save()
   }
