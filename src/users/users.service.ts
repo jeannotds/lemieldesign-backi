@@ -23,7 +23,7 @@ export class UsersService {
 
     const savedUser = await newUser.save();
 
-    const token = this.jwtService.sign({ sub: savedUser._id, email: savedUser.email });
+    const token = this.jwtService.sign({ sub: savedUser._id, email: savedUser.email, username: savedUser.username });
 
     const { password, ...userWithoutPassword } = savedUser.toObject();
 
@@ -45,7 +45,7 @@ export class UsersService {
 
       if(!isMatch) throw new UnauthorizedException('Mail ou Mot de passe Incorrect');
 
-      const token = this.jwtService.sign({ sub: findUser._id, email: findUser.email });
+      const token = this.jwtService.sign({ sub: findUser._id, email: findUser.email, username: findUser.username});
 
       const {password, ...userWithoutPassword } = findUser.toObject();
 
