@@ -1,7 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { LoginUserDto } from 'src/dto/login-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -16,6 +17,16 @@ export class UsersController {
   @Post('/login')
   signin(@Body() loginUserDto: LoginUserDto){
     return this.userService.loginUser(loginUserDto);
+  }
+
+    // --- Route protégée ---
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  getProfile(@Req() req) {
+    console.log("req : ", req.user)
+    
+    // req.user contient ce que retourne validate() dans JwtStrategy
+    return { message: 'Route protégée', user: req.user };
   }
 
 
