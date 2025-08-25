@@ -1,21 +1,10 @@
 // create-produit.dto.ts
 import { IsString, IsNumber, IsNotEmpty, IsMongoId, IsArray } from 'class-validator';
 
-export class CreateProduitDto {
+export class CreateCaracteristicDto {
+
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @IsString()
-  description: string;
-
-  @IsNumber()
-  price: number;
-
-  @IsMongoId()
-  collection: string; // ID de la collection choisie
-
-  @IsArray()
-  @IsMongoId({ each: true })
-  caracteristiques: string[]; // Liste d’IDs des caractéristiques
 }

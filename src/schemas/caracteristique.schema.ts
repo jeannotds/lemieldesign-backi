@@ -9,8 +9,8 @@ export class Caracteristique {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
-  value: string; // ex: "Rouge", "XL", "Coton"
+  // @Prop({ required: true })
+  // value: string; // ex: "Rouge", "XL", "Coton"
 }
 
 export const CaracteristiqueSchema = SchemaFactory.createForClass(Caracteristique);
