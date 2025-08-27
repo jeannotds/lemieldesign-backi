@@ -2,12 +2,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Collection } from './collection.schema';
-import { Caracteristique } from './caracteristique.schema';
+import { Caracteristic } from './caracteristic.schema';
 
-export type ProduitDocument = Produit & Document;
+export type ProductDocument = Product & Document;
 
 @Schema({ timestamps: true })
-export class Produit {
+export class Product {
   @Prop({ required: true })
   name: string;
 
@@ -22,8 +22,8 @@ export class Produit {
   collection: Collection;
 
   // Liste de caractéristiques
-  @Prop({ type: [{ type: Types.ObjectId, ref: Caracteristique.name }] })
-  caracteristiques: Caracteristique[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: Caracteristic.name }] })
+  caracteristics: Caracteristic[];
 }
 
-export const ProduitSchema = SchemaFactory.createForClass(Produit);
+export const ProductSchema = SchemaFactory.createForClass(Product);

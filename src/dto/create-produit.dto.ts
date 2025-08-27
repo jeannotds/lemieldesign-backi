@@ -17,5 +17,5 @@ export class CreateProduitDto {
 
   @IsArray()
   @IsMongoId({ each: true })
-  caracteristiques: string[]; // Liste d’IDs des caractéristiques
+  caracteristics: string[]; // Liste d’IDs des caractéristiques
 }

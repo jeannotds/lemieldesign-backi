@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { CaracteristicsController } from './caracteristics.controller';
-import { CaracteristicsService } from './caracteristics.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Collection } from 'mongoose';
-import { CaracteristiqueSchema } from 'src/schemas/caracteristique.schema';
+import { Caracteristic, CaracteristicSchema } from 'src/schemas/caracteristic.schema';
+import { CaracteristicsService } from './caracteristics.service';
 
 @Module({
   imports: [
-      MongooseModule.forFeature([{name: Collection.name, schema: CaracteristiqueSchema}]),
+      MongooseModule.forFeature([{name: Caracteristic.name, schema: CaracteristicSchema}]),
     ],
   controllers: [CaracteristicsController],
   providers: [CaracteristicsService],

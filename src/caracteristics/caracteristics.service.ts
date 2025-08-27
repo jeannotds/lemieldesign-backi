@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Collection, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { CreateCaracteristicDto } from 'src/dto/create-caracteristic.dto';
-import { CaracteristiqueDocument } from 'src/schemas/caracteristique.schema';
+import { Caracteristic, CaracteristicDocument } from 'src/schemas/caracteristic.schema';
 
 @Injectable()
 export class CaracteristicsService {
-  constructor(@InjectModel(Collection.name) private caracteristicModel: Model<CaracteristiqueDocument>){}
+  constructor(@InjectModel(Caracteristic.name) private caracteristicModel: Model<CaracteristicDocument>){}
   
 
   async addCaracteristic(createCaracteristicDto: CreateCaracteristicDto)  {

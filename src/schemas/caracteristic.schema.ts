@@ -2,10 +2,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type CaracteristiqueDocument = Caracteristique & Document;
+export type CaracteristicDocument = Caracteristic & Document;
 
 @Schema({ timestamps: true })
-export class Caracteristique {
+export class Caracteristic {
   @Prop({ required: true })
   name: string;
 
@@ -13,4 +13,4 @@ export class Caracteristique {
   // value: string; // ex: "Rouge", "XL", "Coton"
 }
 
-export const CaracteristiqueSchema = SchemaFactory.createForClass(Caracteristique);
+export const CaracteristicSchema = SchemaFactory.createForClass(Caracteristic);
