@@ -16,8 +16,8 @@ export class CaracteristicsService {
   }
 
   async getCaracteristic()  {
-    const getCaracteristics = await this.caracteristicModel.find()
-    return getCaracteristics;
+    const caracteristics = await this.caracteristicModel.find()
+    return caracteristics;
   }
 
 }
