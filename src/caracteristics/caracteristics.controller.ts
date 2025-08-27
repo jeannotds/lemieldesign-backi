@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CaracteristicsService } from './caracteristics.service';
 import { CreateCaracteristicDto } from 'src/dto/create-caracteristic.dto';
 
@@ -8,7 +8,12 @@ export class CaracteristicsController {
 
   @Post('/add')
   async create(@Body() createCaracteristicDto : CreateCaracteristicDto) {
-    return this.caracteristicsService.addCaracteristic(createCaracteristicDto);
+    return await this.caracteristicsService.addCaracteristic(createCaracteristicDto);
+  }
+
+  @Get()
+  async get() {
+    return this.caracteristicsService.getCaracteristic();
   }
 
 }
