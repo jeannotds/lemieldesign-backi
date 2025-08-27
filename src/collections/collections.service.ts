@@ -21,11 +21,10 @@ export class CollectionsService {
 
 
   
-    async getCollections(){
+  async getCollections(){
 
-    const newCollection = this.collectionModel.find();
-
-    return newCollection;
+    const collection = this.collectionModel.find();
+    return collection;
     
   }
   
