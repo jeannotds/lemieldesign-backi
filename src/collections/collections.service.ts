@@ -18,6 +18,17 @@ export class CollectionsService {
     return saveCollection;
     
   }
+
+
+  
+    async getCollections(){
+
+    const newCollection = this.collectionModel.find();
+
+    return newCollection;
+    
+  }
+  
   
 }
 
