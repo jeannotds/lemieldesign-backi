@@ -7,7 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class CaracteristicsController {
   constructor(private readonly caracteristicsService: CaracteristicsService){}
 
-   @UseGuards(AuthGuard('jwt'))
+  //  @UseGuards(AuthGuard('jwt'))
   @Post('/add')
   async create(@Body() createCaracteristicDto : CreateCaracteristicDto) {
     return await this.caracteristicsService.addCaracteristic(createCaracteristicDto);

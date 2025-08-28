@@ -9,7 +9,7 @@ export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService){}
   
     // --- Route protégée ---
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @Post('/add')
   async create(@Body() cretaeCollection: CollectionDto){
     return await this.collectionsService.addCollection(cretaeCollection)

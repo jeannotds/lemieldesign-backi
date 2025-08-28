@@ -8,7 +8,7 @@ export class ProductsController {
 
   constructor(private readonly productsService: ProductsService){}
 
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @Post('/post')
   async create(@Body() createProduitDto: CreateProduitDto){
     return this.productsService.postProduct(createProduitDto)
