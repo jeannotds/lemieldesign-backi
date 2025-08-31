@@ -13,8 +13,6 @@ export class ProductsController {
   @UseInterceptors(FilesInterceptor('images')) // 'images' = nom du champ dans le form-data
   @Post('/post')
   async create(@Body() createProduitDto: any, @UploadedFiles() files: Express.Multer.File[],){
-    console.log("files : ", files)
-    console.log('createProduitDto : ', createProduitDto)
     return this.productsService.postProduct(createProduitDto, files)
   }
 
