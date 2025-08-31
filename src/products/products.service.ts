@@ -28,23 +28,6 @@ export class ProductsService {
     });
   }
 
-  // async postProduct(createProduitDto: any, files: Express.Multer.File[]): Promise<Product> {
-
-  //   const images = [];
-
-  //   for (const file of files) {
-  //   const result = await cloudinary.uploader.upload(file.path, {
-  //     folder: 'products',
-  //   });
-  //   images.push({ url: result.secure_url, public_id: result.public_id });
-  // }
-
-
-  //   const newProduit = new this.productModel({...createProduitDto, images});
-  //   return newProduit.save();
-
-  // }
-
    async postProduct(createProduitDto: CreateProduitDto, files: Express.Multer.File[]): Promise<Product> {
     let images: { url: string; public_id: string }[] = [];
 
@@ -64,7 +47,7 @@ export class ProductsService {
 
     const newProduit = new this.productModel({
       ...createProduitDto,
-      price: Number(createProduitDto.price), // ⚡ convertir string en number
+      price: Number(createProduitDto.price),
       images,
     });
 
@@ -74,8 +57,8 @@ export class ProductsService {
   async findAll(): Promise<Product[]> {
     return this.productModel
       .find()
-      .populate('collection') // populate de la collection
-      .populate('caracteristics'); // populate des caractéristiques
+      .populate('collection')
+      .populate('caracteristics');
   }
 
   async findOne(id: string): Promise<Product> {
