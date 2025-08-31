@@ -17,6 +17,9 @@ export class Product {
   @Prop({ required: true })
   price: number;
 
+  @Prop({ type: [{ url: String, public_id: String }] }) // ⬅️ tableau pour stocker les images Cloudinary
+  images: { url: string; public_id: string }[];
+
   // Référence à une Collection
   @Prop({ type: Types.ObjectId, ref: Collection.name, required: true })
   collection: Collection;

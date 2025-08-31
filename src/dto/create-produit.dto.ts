@@ -1,5 +1,5 @@
 // create-produit.dto.ts
-import { IsString, IsNumber, IsNotEmpty, IsMongoId, IsArray } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsMongoId, IsArray, IsOptional } from 'class-validator';
 
 export class CreateProduitDto {
   @IsString()
@@ -11,6 +11,11 @@ export class CreateProduitDto {
 
   @IsNumber()
   price: number;
+
+   // Tableau d’images Cloudinary (optionnel)
+  @IsArray()
+  @IsOptional()
+  images?: { url: string; public_id: string }[];
 
   @IsMongoId()
   collection: string; // ID de la collection choisie
