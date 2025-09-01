@@ -9,7 +9,7 @@ export class ProductsController {
 
   constructor(private readonly productsService: ProductsService){}
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FilesInterceptor('images')) // 'images' = nom du champ dans le form-data
   @Post('/post')
   async create(@Body() createProduitDto: any, @UploadedFiles() files: Express.Multer.File[],){

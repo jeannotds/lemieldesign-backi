@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { CollectionDto } from 'src/dto/create-collection.dto';
 import { CollectionsService } from './collections.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -9,9 +9,9 @@ export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService){}
   
     // --- Route protégée ---
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Post('/add')
-  async create(@Body() cretaeCollection: CollectionDto){
+  async create(@Body() cretaeCollection: CollectionDto, @Req() req){
     return await this.collectionsService.addCollection(cretaeCollection)
   }
 
