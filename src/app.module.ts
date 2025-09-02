@@ -30,7 +30,7 @@ import { ProductsModule } from './products/products.module';
     UsersModule,
     MongooseModule.forRootAsync({
       useFactory: () => ({
-        uri: 'mongodb+srv://laetitia:lemieldesign@cluster0.rtltvsv.mongodb.net/lemieldesign',
+        uri: 'mongodb+srv://laetitia:lemieldesign@cluster0.rtltvsv.mongodb.net/lemieldesign?retryWrites=true&w=majority',
         connectionFactory: (connection) => {
           connection.on('connected', () => {
             console.log('✅ Connexion à MongoDB réussie');
