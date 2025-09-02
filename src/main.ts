@@ -15,6 +15,6 @@ async function bootstrap() {
     // ⚡ Active la validation partout
   app.useGlobalPipes(new ValidationPipe());
 
-  await app.listen(3001);
+  await app.listen(3000);
 }
 bootstrap();
