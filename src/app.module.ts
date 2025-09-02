@@ -19,6 +19,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
+import { CollectionsController } from './collections/collections.controller';
+import { CollectionsModule } from './collections/collections.module';
+import { CaracteristicsModule } from './caracteristics/caracteristics.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -37,8 +42,12 @@ import { MongooseModule } from '@nestjs/mongoose';
         },
       }),
     }),
+    AuthModule,
+    CollectionsModule,
+    CaracteristicsModule,
+    ProductsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, CollectionsController],
   providers: [AppService],
 })
 export class AppModule {}

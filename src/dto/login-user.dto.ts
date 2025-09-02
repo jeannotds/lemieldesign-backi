@@ -1,9 +1,7 @@
-import { IsEmail, IsString, Matches, MinLength } from "class-validator";
+import { IsEmail, Matches, MinLength } from "class-validator";
 
-export class CreateUserDto {
-  @IsString()
-  username: string;
-  
+export class LoginUserDto {
+
   @IsEmail({}, { message: 'Email invalide' })
   email: string;
   
@@ -12,5 +10,4 @@ export class CreateUserDto {
     message: 'Le mot de passe doit contenir au moins un chiffre et un caractère spécial',
   })
   password: string;
-  // readonly password: string;
 }
