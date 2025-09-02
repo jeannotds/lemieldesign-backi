@@ -7,7 +7,11 @@ async function bootstrap() {
 
     // ✅ Active CORS
   app.enableCors({
-    origin: 'http://localhost:3000', // ton frontend Next.js
+    // origin: 'http://localhost:3000', // ton frontend Next.js
+     origin: [
+      'http://localhost:3000', // dev
+      'https://lemieldesign-hhmr.vercel.app', // prod
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
