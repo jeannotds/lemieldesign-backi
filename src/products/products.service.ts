@@ -58,14 +58,14 @@ export class ProductsService {
     return this.productModel
       .find()
       .populate('collection')
-      .populate('caracteristics');
+      // .populate('caracteristics');
   }
 
   async findOne(id: string): Promise<Product> {
     return this.productModel
       .findById(id)
       .populate('collection')
-      .populate('caracteristics');
+      // .populate('caracteristics');
   }
 
 }
