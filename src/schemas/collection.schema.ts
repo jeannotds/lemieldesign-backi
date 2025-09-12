@@ -11,6 +11,15 @@ export class Collection {
 
   @Prop()
   description: string;
+
+   @Prop({
+    type: {
+      url: String,
+      public_id: String,
+    },
+  })
+  image: { url: string; public_id: string };
+
 }
 
 export const CollectionSchema = SchemaFactory.createForClass(Collection);

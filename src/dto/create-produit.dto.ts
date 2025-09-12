@@ -20,7 +20,7 @@ export class CreateProduitDto {
   @IsMongoId()
   collection: string; // ID de la collection choisie
 
-  @IsArray()
-  @IsMongoId({ each: true })
-  caracteristics: string[]; // Liste d’IDs des caractéristiques
+  // @IsArray()
+  // @IsMongoId({ each: true })
+  // caracteristics: string[]; // Liste d’IDs des caractéristiques
 }

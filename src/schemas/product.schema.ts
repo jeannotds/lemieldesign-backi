@@ -25,8 +25,8 @@ export class Product {
   collection: Collection;
 
   // Liste de caractéristiques
-  @Prop({ type: [{ type: Types.ObjectId, ref: Caracteristic.name }] })
-  caracteristics: Caracteristic[];
+  // @Prop({ type: [{ type: Types.ObjectId, ref: Caracteristic.name }] })
+  // caracteristics: Caracteristic[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
