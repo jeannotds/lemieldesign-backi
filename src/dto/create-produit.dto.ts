@@ -1,4 +1,5 @@
 // create-produit.dto.ts
+import { Type } from 'class-transformer';
 import { IsString, IsNumber, IsNotEmpty, IsMongoId, IsArray, IsOptional } from 'class-validator';
 
 export class CreateProduitDto {
@@ -9,7 +10,8 @@ export class CreateProduitDto {
   @IsString()
   description: string;
 
-  @IsNumber()
+  // @IsNumber()
+  @Type(() => Number) // ✅ conversion string -> number
   price: number;
 
    // Tableau d’images Cloudinary (optionnel)
