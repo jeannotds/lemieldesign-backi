@@ -26,8 +26,11 @@
 import { 
   Body, 
   Controller, 
+  Delete, 
   Get, 
+  Param, 
   Post, 
+  Put, 
   UploadedFile, 
   UseGuards, 
   UseInterceptors 
@@ -55,5 +58,23 @@ export class CollectionsController {
   @Get()
   async get() {
     return await this.collectionsService.getCollections();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Put('/:id')
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @Param('id') id: string,
+    @Body() collectionDto: CollectionDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.collectionsService.updateCollection(id, collectionDto, file);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/:id')
+  async remove(@Param('id') id: string) {
+    console.log('id delete : ', id)
+    return this.collectionsService.deleteCollection(id);
   }
 }
