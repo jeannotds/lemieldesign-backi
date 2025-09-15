@@ -34,7 +34,7 @@
 
 
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { cloudinary } from 'config/cloudinary.config';
@@ -87,5 +87,25 @@ export class CollectionsService {
   // --- Récupérer toutes les collections ---
   async getCollections() {
     return this.collectionModel.find();
+  }
+
+  async updateCollection(id: string, dto: CollectionDto, file?: Express.Multer.File): Promise<Collection> {
+    const collection = await this.collectionModel.findById(id);
+    if (!collection) throw new NotFoundException('Collection not found');
+
+    if (file) {
+      collection.image = await this.uploadToCloudinary(file);
+    }
+
+    collection.name = dto.name ?? collection.name;
+    collection.description = dto.description ?? collection.description;
+
+    return collection.save();
+  }
+
+  async deleteCollection(id: string): Promise<{ message: string }> {
+    const collection = await this.collectionModel.findByIdAndDelete(id);
+    if (!collection) throw new NotFoundException('Collection not found');
+    return { message: 'Collection deleted successfully' };
   }
 }

@@ -68,4 +68,30 @@ export class ProductsService {
       // .populate('caracteristics');
   }
 
+
+  // ✅ DELETE product
+  async deleteProduct(id: string): Promise<{ message: string }> {
+    await this.productModel.findByIdAndDelete(id);
+    return { message: 'Produit supprimé avec succès' };
+  }
+
+  // ✅ UPDATE product
+  async updateProduct(id: string, updateProduitDto: CreateProduitDto, files: Express.Multer.File[]): Promise<Product> {
+    let images: { url: string; public_id: string }[] = [];
+
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const uploaded = await this.uploadToCloudinary(file);
+        images.push(uploaded);
+      }
+      updateProduitDto.images = images;
+    }
+
+    return this.productModel.findByIdAndUpdate(
+      id,
+      { ...updateProduitDto, price: Number(updateProduitDto.price) },
+      { new: true },
+    );
+  }
+
 }
