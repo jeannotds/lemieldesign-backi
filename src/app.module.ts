@@ -24,9 +24,14 @@ import { CollectionsController } from './collections/collections.controller';
 import { CollectionsModule } from './collections/collections.module';
 import { CaracteristicsModule } from './caracteristics/caracteristics.module';
 import { ProductsModule } from './products/products.module';
+import { SendmailsModule } from './sendmails/sendmails.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // permet d'accéder partout sans réimporter
+    }),
     UsersModule,
     MongooseModule.forRootAsync({
       useFactory: () => ({
@@ -46,6 +51,7 @@ import { ProductsModule } from './products/products.module';
     CollectionsModule,
     CaracteristicsModule,
     ProductsModule,
+    SendmailsModule,
   ],
   controllers: [AppController, CollectionsController],
   providers: [AppService],
