@@ -4,27 +4,56 @@ import { cloudinary } from 'config/cloudinary.config';
 import { Model } from 'mongoose';
 import { CreateProduitDto } from 'src/dto/create-produit.dto';
 import { Product, ProductDocument } from 'src/schemas/product.schema';
-
+import * as sharp from 'sharp';
 @Injectable()
 export class ProductsService {
 
   constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>){}
 
 
+  // async uploadToCloudinary(file: Express.Multer.File): Promise<{ url: string; public_id: string }> {
+  //   return new Promise((resolve, reject) => {
+  //     const upload = cloudinary.uploader.upload_stream(
+  //       // {
+  //       //   folder: 'products',
+  //       // },
+  //        {
+  //         folder: 'products',
+  //         quality: 'auto',   // ajuste la qualité automatiquement
+  //         fetch_format: 'auto', // convertit en WebP/AVIF selon le navigateur
+  //         transformation: [
+  //           { width: 1200, height: 1200, crop: "limit" } // limite la taille max
+  //         ]
+  //       },
+  //       (error, result) => {
+  //         if (error) return reject(error);
+  //         resolve({ url: result.secure_url, public_id: result.public_id });
+  //       },
+  //     );
+
+  //     // on envoie le buffer de multer dans le stream cloudinary
+  //     upload.end(file.buffer);
+  //   });
+  // }
+
   async uploadToCloudinary(file: Express.Multer.File): Promise<{ url: string; public_id: string }> {
     return new Promise((resolve, reject) => {
-      const upload = cloudinary.uploader.upload_stream(
-        {
-          folder: 'products',
-        },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve({ url: result.secure_url, public_id: result.public_id });
-        },
-      );
-
-      // on envoie le buffer de multer dans le stream cloudinary
-      upload.end(file.buffer);
+      // compression avec sharp
+      sharp(file.buffer)
+        .resize(1200, 1200, { fit: 'inside' }) // max 1200px, garde les proportions
+        .jpeg({ quality: 80 }) // compression JPEG qualité 80%
+        .toBuffer()
+        .then((compressedBuffer) => {
+          const upload = cloudinary.uploader.upload_stream(
+            { folder: 'products' }, // tu peux rajouter d’autres options ici si besoin
+            (error, result) => {
+              if (error) return reject(error);
+              resolve({ url: result.secure_url, public_id: result.public_id });
+            },
+          );
+          upload.end(compressedBuffer); // envoi l'image compressée
+        })
+        .catch(reject);
     });
   }
 
