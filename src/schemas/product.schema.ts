@@ -14,8 +14,15 @@ export class Product {
   @Prop()
   description: string;
 
-  @Prop({ required: true })
-  price: number;
+  // @Prop({ required: true })
+  // price: number;
+
+  @Prop({type: [{
+        label: { type: String, required: true }, price: { type: Number, required: true }, },
+      ],
+    default: [],
+  })
+  sizes: { label: string; price: number }[];
 
   @Prop({ type: [{ url: String, public_id: String }] }) // ⬅️ tableau pour stocker les images Cloudinary
   images: { url: string; public_id: string }[];
