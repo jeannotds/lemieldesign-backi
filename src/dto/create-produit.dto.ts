@@ -1,7 +1,14 @@
 // create-produit.dto.ts
 import { Type } from 'class-transformer';
-import { IsString, IsNumber, IsNotEmpty, IsMongoId, IsArray, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsMongoId, IsArray, IsOptional, ValidateNested } from 'class-validator';
 
+class SizeDto {
+  @IsString()
+  label: string;
+
+  @IsNotEmpty()
+  price: number;
+}
 export class CreateProduitDto {
   @IsString()
   @IsNotEmpty()
@@ -11,8 +18,15 @@ export class CreateProduitDto {
   description: string;
 
   // @IsNumber()
-  @Type(() => Number) // ✅ conversion string -> number
-  price: number;
+  // @Type(() => Number) // ✅ conversion string -> number
+  // price: number;
+
+
+  // ✅ Ajout du tableau des tailles
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SizeDto)
+  sizes: SizeDto[];
 
    // Tableau d’images Cloudinary (optionnel)
   @IsArray()

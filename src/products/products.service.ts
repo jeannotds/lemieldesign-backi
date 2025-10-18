@@ -10,32 +10,6 @@ export class ProductsService {
 
   constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>){}
 
-
-  // async uploadToCloudinary(file: Express.Multer.File): Promise<{ url: string; public_id: string }> {
-  //   return new Promise((resolve, reject) => {
-  //     const upload = cloudinary.uploader.upload_stream(
-  //       // {
-  //       //   folder: 'products',
-  //       // },
-  //        {
-  //         folder: 'products',
-  //         quality: 'auto',   // ajuste la qualité automatiquement
-  //         fetch_format: 'auto', // convertit en WebP/AVIF selon le navigateur
-  //         transformation: [
-  //           { width: 1200, height: 1200, crop: "limit" } // limite la taille max
-  //         ]
-  //       },
-  //       (error, result) => {
-  //         if (error) return reject(error);
-  //         resolve({ url: result.secure_url, public_id: result.public_id });
-  //       },
-  //     );
-
-  //     // on envoie le buffer de multer dans le stream cloudinary
-  //     upload.end(file.buffer);
-  //   });
-  // }
-
   async uploadToCloudinary(file: Express.Multer.File): Promise<{ url: string; public_id: string }> {
     return new Promise((resolve, reject) => {
       // compression avec sharp
@@ -76,7 +50,10 @@ export class ProductsService {
 
     const newProduit = new this.productModel({
       ...createProduitDto,
-      price: Number(createProduitDto.price),
+      sizes: createProduitDto.sizes.map(s => ({
+        label: s.label,
+        price: Number(s.price),
+      })),
       images,
     });
 
@@ -116,11 +93,16 @@ export class ProductsService {
       updateProduitDto.images = images;
     }
 
+    const sizes = updateProduitDto.sizes?.map(s => ({
+      label: s.label,
+      price: Number(s.price),
+    }));
+
     return this.productModel.findByIdAndUpdate(
       id,
-      { ...updateProduitDto, price: Number(updateProduitDto.price) },
+      { ...updateProduitDto, sizes },
       { new: true },
     );
-  }
+    }
 
 }
