@@ -82,27 +82,69 @@ export class ProductsService {
   }
 
   // ✅ UPDATE product
-  async updateProduct(id: string, updateProduitDto: CreateProduitDto, files: Express.Multer.File[]): Promise<Product> {
-    let images: { url: string; public_id: string }[] = [];
+  // async updateProduct(id: string, updateProduitDto: CreateProduitDto, files: Express.Multer.File[]): Promise<Product> {
+  //   let images: { url: string; public_id: string }[] = [];
 
+  //   if (files && files.length > 0) {
+  //     for (const file of files) {
+  //       const uploaded = await this.uploadToCloudinary(file);
+  //       images.push(uploaded);
+  //     }
+  //     updateProduitDto.images = images;
+  //   }
+
+  //   const sizes = updateProduitDto.sizes?.map(s => ({
+  //     label: s.label,
+  //     price: Number(s.price),
+  //   }));
+
+  //   return this.productModel.findByIdAndUpdate(
+  //     id,
+  //     { ...updateProduitDto, sizes },
+  //     { new: true },
+  //   );
+  //   }
+
+  async updateProduct(id: string, updateProduitDto: any, files: Express.Multer.File[]): Promise<Product> {
+    // ----- Récupérer le produit existant -----
+    const product = await this.productModel.findById(id);
+    if (!product) throw new Error('Produit non trouvé');
+  
+    // ----- Anciennes images à conserver -----
+    const productImages: { _id: any; url: string; public_id: string }[] = product.images as any;
+
+    let imagesToKeep = [];
+    if (updateProduitDto.existingImages && Array.isArray(updateProduitDto.existingImages)) {
+      imagesToKeep = productImages.filter(img =>
+        updateProduitDto.existingImages.includes(img._id.toString())
+      );
+    }
+  
+    // ----- Upload des nouvelles images -----
     if (files && files.length > 0) {
       for (const file of files) {
         const uploaded = await this.uploadToCloudinary(file);
-        images.push(uploaded);
+        imagesToKeep.push(uploaded);
       }
-      updateProduitDto.images = images;
     }
-
+  
+    // ----- Gestion des tailles -----
     const sizes = updateProduitDto.sizes?.map(s => ({
       label: s.label,
       price: Number(s.price),
     }));
-
+  
+    // ----- Update produit -----
     return this.productModel.findByIdAndUpdate(
       id,
-      { ...updateProduitDto, sizes },
+      {
+        ...updateProduitDto,
+        sizes,
+        images: imagesToKeep,
+      },
       { new: true },
     );
-    }
+  }
+  
 
 }
