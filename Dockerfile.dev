@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci
+
+# RUN npm run build # pour le build production # ⚠️ commenté pour le dev
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm","run", "start:dev"]
+
+# CMD ["node", "dist/main.js"] # pour le build production # ⚠️ commenté pour le dev
