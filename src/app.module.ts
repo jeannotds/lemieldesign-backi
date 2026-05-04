@@ -35,7 +35,7 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     MongooseModule.forRootAsync({
       useFactory: () => ({
-        uri: 'mongodb+srv://laetitia:lemieldesign@cluster0.rtltvsv.mongodb.net/lemieldesign?retryWrites=true&w=majority',
+        uri: process.env.MONGO_URI,
         connectionFactory: (connection) => {
           connection.on('connected', () => {
             console.log('✅ Connexion à MongoDB réussie');

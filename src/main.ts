@@ -20,6 +20,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   // await app.listen(3000);
-  await app.listen(process.env.PORT || 3001);
+  // process.env.PORT est le port de l'application 3000 est le port du conteneur
+  await app.listen(process.env.PORT || 3000, '0.0.0.0'); // 0.0.0.0 permet de rendre l'application accessible depuis l'extérieur 0.0.0.0 est l'adresse IP de la machine
 }
 bootstrap();
