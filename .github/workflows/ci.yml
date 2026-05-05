@@ -1,5 +1,5 @@
 # Workflow pour le backend
-name: Backend CI
+name: Backend CI # on peut déclencher le workflow lorsqu'on fait une pull request
 
 # Événements pour déclencher le workflow
 on: # on peut déclencher le workflow manuellement ou automatiquement
