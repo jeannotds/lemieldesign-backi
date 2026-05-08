@@ -26,6 +26,8 @@ import { CaracteristicsModule } from './caracteristics/caracteristics.module';
 import { ProductsModule } from './products/products.module';
 import { SendmailsModule } from './sendmails/sendmails.module';
 import { ConfigModule } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -52,6 +54,22 @@ import { ConfigModule } from '@nestjs/config';
     CaracteristicsModule,
     ProductsModule,
     SendmailsModule,
+    
+    // ✅ Cache Redis
+    CacheModule.registerAsync({
+      isGlobal: true,
+
+      useFactory: async () => ({
+        store: await redisStore({
+          socket: {
+            host: 'redis',
+            port: 6379,
+          },
+        }),
+
+        ttl: 60, // cache par défaut : 60 sec
+      }),
+    }),
   ],
   controllers: [AppController, CollectionsController],
   providers: [AppService],
