@@ -11,6 +11,7 @@ async function bootstrap() {
      origin: [
       'http://localhost:3000', // dev
       'https://lemieldesign-hhmr.vercel.app', // prod
+      'https://api.lemieldesign.tech', // prod hostinger
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
