@@ -21,7 +21,7 @@ jobs:
             # Si une commande échoue, le déploiement s'arrête immédiatement.
             set -e
             echo "Pulling latest code..."
-            cd /home/lemieldesign-backend || exit 1
+            cd /home/lemieldesign-backi || exit 1
             git pull origin main
             echo "Installing dependencies..."
             npm ci || npm install
