@@ -1,0 +1,35 @@
+name: Backend CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@1.2.0 
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Si une commande échoue, le déploiement s'arrête immédiatement.
+            set -e
+            echo "Pulling latest code..."
+            cd /home/lemieldesign-backend || exit 1
+            git pull origin main
+            echo "Installing dependencies..."
+            npm ci || npm install
+            echo "Building project..."
+            npm run build
+            echo "Restarting PM2..."
+            pm2 delete backend || true
+            pm2 start npm --name "backend" -- start -- -p 3000
+            pm2 save
+            echo "✅ Deployment successful!"
+
