@@ -34,5 +34,13 @@ jobs:
             pm2 start dist/src/main.js --name backend
             pm2 save
             echo "✅ Deployment successful!"
+
+            # professionnel
+            # pm2 start dist/src/main.js \
+            # --name backend \
+            # --cwd /home/lemieldesign-backi \
+            # --time \
+            # --max-restarts 10
+
             
 
