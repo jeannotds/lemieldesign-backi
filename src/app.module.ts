@@ -40,20 +40,30 @@ import { redisStore } from 'cache-manager-redis-store';
     SendmailsModule,
     
     // ✅ Cache Redis
+    // CacheModule.registerAsync({
+    //   isGlobal: true,
+
+    //   useFactory: async () => ({
+    //     store: await redisStore({
+    //       socket: {
+    //         host: 'redis',
+    //         port: 6379,
+    //       },
+    //     }),
+
+    //     ttl: 60, // cache par défaut : 60 sec
+    //   }),
+    // }),
+
     CacheModule.registerAsync({
       isGlobal: true,
-
       useFactory: async () => ({
         store: await redisStore({
-          socket: {
-            // host: 'redis',
-            url: process.env.REDIS_URL,
-            // port: 6379,
-          },
+          url: process.env.REDIS_URL,
         }),
         ttl: Number(process.env.PRODUCTS_CACHE_TTL || 60),
       }),
-    }),
+    })
   ],
   controllers: [AppController, CollectionsController],
   providers: [AppService],
