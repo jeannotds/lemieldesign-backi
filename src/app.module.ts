@@ -1,19 +1,3 @@
-// import { Module } from '@nestjs/common';
-// import { AppController } from './app.controller';
-// import { AppService } from './app.service';
-// import { UsersModule } from './users/users.module';
-// import { MongooseModule } from '@nestjs/mongoose';
-
-// @Module({
-//   imports: [UsersModule, 
-//     MongooseModule.forRoot('mongodb+srv://laetitia:lemieldesign@cluster0.rtltvsv.mongodb.net/lemieldesign?retryWrites=true&w=majority&appName=Cluster0'),
-//   ],
-//   controllers: [AppController],
-//   providers: [AppService],
-// })
-// export class AppModule {}
-
-
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -62,12 +46,12 @@ import { redisStore } from 'cache-manager-redis-store';
       useFactory: async () => ({
         store: await redisStore({
           socket: {
-            host: 'redis',
-            port: 6379,
+            // host: 'redis',
+            url: process.env.REDIS_URL,
+            // port: 6379,
           },
         }),
-
-        ttl: 60, // cache par défaut : 60 sec
+        ttl: Number(process.env.PRODUCTS_CACHE_TTL || 60),
       }),
     }),
   ],
