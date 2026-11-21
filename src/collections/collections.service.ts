@@ -34,18 +34,28 @@
 
 
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { cloudinary } from 'config/cloudinary.config';
 import { CollectionDto } from 'src/dto/create-collection.dto';
 import { Collection, CollectionDocument } from 'src/schemas/collection.schema';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { bumpCacheVersion, cacheVersion, remember } from 'src/common/list-cache';
+import {
+  PaginatedResponse,
+  escapeRegex,
+  paginateModel,
+  parseListQuery,
+} from 'src/common/pagination';
 
 @Injectable()
 export class CollectionsService {
   constructor(
     @InjectModel(Collection.name) 
-    private collectionModel: Model<CollectionDocument>
+    private collectionModel: Model<CollectionDocument>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // --- Upload vers Cloudinary ---
@@ -81,12 +91,36 @@ export class CollectionsService {
       image,
     });
 
-    return await newCollection.save();
+    const saved = await newCollection.save();
+    await this.invalidateLists();
+    return saved;
   }
 
-  // --- Récupérer toutes les collections ---
-  async getCollections() {
-    return this.collectionModel.find();
+  async assertExists(id: string): Promise<CollectionDocument> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Identifiant de collection invalide');
+    }
+    const collection = await this.collectionModel.findById(id);
+    if (!collection) throw new NotFoundException('Collection introuvable');
+    return collection;
+  }
+
+  async getCollections(rawQuery: Record<string, unknown> = {}): Promise<PaginatedResponse<Collection>> {
+    const listQuery = parseListQuery(rawQuery, 'collection');
+    const filters: Record<string, unknown>[] = [];
+
+    if (listQuery.q) {
+      const rx = new RegExp(escapeRegex(listQuery.q), 'i');
+      filters.push({ $or: [{ name: rx }, { description: rx }] });
+    }
+
+    const baseFilter = filters.length === 1 ? filters[0] : {};
+    const version = await cacheVersion(this.cacheManager, 'collections');
+    const cacheKey = `collections:v${version}:${JSON.stringify({ ...listQuery, filter: baseFilter })}`;
+
+    return remember(this.cacheManager, cacheKey, 60 * 1000, () =>
+      paginateModel<Collection>(this.collectionModel, baseFilter, listQuery),
+    );
   }
 
   async updateCollection(id: string, dto: CollectionDto, file?: Express.Multer.File): Promise<Collection> {
@@ -100,12 +134,20 @@ export class CollectionsService {
     collection.name = dto.name ?? collection.name;
     collection.description = dto.description ?? collection.description;
 
-    return collection.save();
+    const saved = await collection.save();
+    await this.invalidateLists();
+    return saved;
   }
 
   async deleteCollection(id: string): Promise<{ message: string }> {
     const collection = await this.collectionModel.findByIdAndDelete(id);
     if (!collection) throw new NotFoundException('Collection not found');
+    await this.invalidateLists();
     return { message: 'Collection deleted successfully' };
+  }
+
+  private async invalidateLists() {
+    await bumpCacheVersion(this.cacheManager, 'collections');
+    await bumpCacheVersion(this.cacheManager, 'products');
   }
 }

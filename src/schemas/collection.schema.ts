@@ -23,3 +23,6 @@ export class Collection {
 }
 
 export const CollectionSchema = SchemaFactory.createForClass(Collection);
+
+CollectionSchema.index({ createdAt: -1, _id: -1 });
+CollectionSchema.index({ name: 1, _id: 1 });

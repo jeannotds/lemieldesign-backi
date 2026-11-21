@@ -31,6 +31,7 @@ import {
   Param, 
   Post, 
   Put, 
+  Query,
   UploadedFile, 
   UseGuards, 
   UseInterceptors 
@@ -56,8 +57,8 @@ export class CollectionsController {
   }
 
   @Get()
-  async get() {
-    return await this.collectionsService.getCollections();
+  async get(@Query() query: Record<string, unknown>) {
+    return await this.collectionsService.getCollections(query);
   }
 
   @UseGuards(AuthGuard('jwt'))

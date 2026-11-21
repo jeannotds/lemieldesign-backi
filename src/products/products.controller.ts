@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProduitDto } from 'src/dto/create-produit.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -17,8 +17,16 @@ export class ProductsController {
   }
 
   @Get()
-  async findAllProduct() {
-    return this.productsService.findAll();
+  async findAllProduct(@Query() query: Record<string, unknown>) {
+    return this.productsService.findPaginated(query);
+  }
+
+  @Get('collection/:collectionId')
+  async findByCollection(
+    @Param('collectionId') collectionId: string,
+    @Query() query: Record<string, unknown>,
+  ) {
+    return this.productsService.findPaginated(query, collectionId);
   }
 
   @Get('/:id')

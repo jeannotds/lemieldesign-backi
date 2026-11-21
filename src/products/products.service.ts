@@ -8,11 +8,22 @@ import * as sharp from 'sharp';
 
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { CollectionsService } from 'src/collections/collections.service';
+import { bumpCacheVersion, cacheVersion, remember } from 'src/common/list-cache';
+import {
+  PaginatedResponse,
+  escapeRegex,
+  paginateModel,
+  parseListQuery,
+} from 'src/common/pagination';
+
 @Injectable()
 export class ProductsService {
-  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>,
-  @Inject(CACHE_MANAGER) private cacheManager: Cache,
-){}
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly collectionsService: CollectionsService,
+  ) {}
 
   async uploadToCloudinary(file: Express.Multer.File): Promise<{ url: string; public_id: string }> {
     return new Promise((resolve, reject) => {
@@ -61,57 +72,62 @@ export class ProductsService {
       images,
     });
 
-    // ❌ invalidation cache
-    await this.cacheManager.del('products:all');
+    const saved = await newProduit.save();
+    await this.invalidateLists();
+    return saved;
+  }
 
-    return newProduit.save();
+  async findPaginated(
+    rawQuery: Record<string, unknown> = {},
+    collectionId?: string,
+  ): Promise<PaginatedResponse<Product>> {
+    const listQuery = parseListQuery(rawQuery, 'product');
+    const filters: Record<string, unknown>[] = [];
+    let collectionSummary: PaginatedResponse<Product>['collection'];
+
+    if (collectionId) {
+      const collection = await this.collectionsService.assertExists(collectionId);
+      // Les anciens produits stockent l'id en chaîne, les nouveaux en ObjectId.
+      filters.push({ $expr: { $eq: [{ $toString: '$collection' }, collectionId] } });
+      collectionSummary = {
+        _id: String(collection._id),
+        name: collection.name,
+        description: collection.description,
+        image: collection.image,
+      };
+    }
+
+    if (listQuery.q) {
+      const rx = new RegExp(escapeRegex(listQuery.q), 'i');
+      filters.push({ $or: [{ name: rx }, { description: rx }] });
+    }
+
+    const baseFilter = filters.length === 0 ? {} : filters.length === 1 ? filters[0] : { $and: filters };
+    const version = await cacheVersion(this.cacheManager, 'products');
+    const cacheKey = `products:v${version}:${collectionId ?? 'all'}:${JSON.stringify({
+      ...listQuery,
+      filter: baseFilter,
+    })}`;
+
+    const page = await remember(this.cacheManager, cacheKey, 60 * 1000, () =>
+      paginateModel<Product>(this.productModel, baseFilter, listQuery, { populate: 'collection' }),
+    );
+
+    return collectionSummary ? { ...page, collection: collectionSummary } : page;
   }
 
   async findAll(): Promise<Product[]> {
-
-    // cacheKey = clé unique pour le cache (products:all)
-    const cacheKey = 'products:all';
-
-    // ✅ Récupérer les produits depuis le cache
-      // 1. Vérifier Redis
-    // const cachedProducts = await this.cacheManager.get(cacheKey);
-    const cachedProducts = await this.cacheManager.get<Product[]>(cacheKey);
-
-    // ✅ Si les produits sont déjà dans le cache, les retourner immédiatement sans aller en base de données
-    if (cachedProducts) {
-      console.log('📦 Produits depuis le cache');
-      return cachedProducts as Product[];
-    }
-
-    console.log('📦 Produits depuis MongoDB');
-
-      // 2. DB call (si pas dans le cache)
-    const products = await this.productModel
-      .find()
-      .populate('collection')
-      // .populate('caracteristics');
-  // 3. Sauvegarder Redis (les produits dans le cache)
-    await this.cacheManager.set(cacheKey, products,  60 * 1000); // 1 minute
-
-    return products;
+    const page = await this.findPaginated({ page: 1, limit: 100 });
+    return page.items;
   }
 
   async findOne(id: string): Promise<Product> {
     const cacheKey = `product:${id}`;
 
-    const cachedProduct = await this.cacheManager.get(cacheKey);
-
-    if(cachedProduct) {
-      const product = cachedProduct as Product;
-      console.log('📦 Produit depuis le cache');
+    return remember(this.cacheManager, cacheKey, 60 * 1000, async () => {
+      const product = await this.productModel.findById(id).populate('collection');
       return product;
-    }
-
-    const product = await this.productModel.findById(id).populate('collection');
-   
-    await this.cacheManager.set(cacheKey, product, 60 * 1000); // 1 minute
-
-    return product;
+    });
   }
 
 
@@ -119,9 +135,8 @@ export class ProductsService {
   async deleteProduct(id: string): Promise<{ message: string }> {
     await this.productModel.findByIdAndDelete(id);
 
-    // ❌ invalidation cache
-    await this.cacheManager.del(`product:${id}`);
-    await this.cacheManager.del('products:all');
+    await this.forgetProduct(id);
+    await this.invalidateLists();
 
     return { message: 'Produit supprimé avec succès' };
   }
@@ -166,12 +181,27 @@ export class ProductsService {
       { new: true },
     );
 
-      // ❌ invalidation cache
-    await this.cacheManager.del(`product:${id}`);
-    await this.cacheManager.del('products:all');
+    await this.forgetProduct(id);
+    await this.invalidateLists();
 
     return updatedProduct;
   }
-  
+
+  private async forgetProduct(id: string) {
+    try {
+      await this.cacheManager.del(`product:${id}`);
+    } catch {
+      // Le détail sera recalculé à la prochaine lecture.
+    }
+  }
+
+  private async invalidateLists() {
+    try {
+      await this.cacheManager.del('products:all');
+    } catch {
+      // Le numéro de version ci-dessous suffit à ignorer les pages en cache.
+    }
+    await bumpCacheVersion(this.cacheManager, 'products');
+  }
 
 }
