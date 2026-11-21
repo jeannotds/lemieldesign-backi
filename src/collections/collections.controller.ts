@@ -61,6 +61,11 @@ export class CollectionsController {
     return await this.collectionsService.getCollections(query);
   }
 
+  @Get('search')
+  async search(@Query() query: Record<string, unknown>) {
+    return this.collectionsService.search(query);
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Put('/:id')
   @UseInterceptors(FileInterceptor('image'))

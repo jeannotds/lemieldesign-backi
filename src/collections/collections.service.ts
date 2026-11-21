@@ -105,6 +105,14 @@ export class CollectionsService {
     return collection;
   }
 
+  async search(rawQuery: Record<string, unknown> = {}): Promise<PaginatedResponse<Collection>> {
+    const listQuery = parseListQuery(rawQuery, 'collection');
+    if (!listQuery.q) {
+      throw new BadRequestException('Indiquez un terme de recherche');
+    }
+    return this.getCollections(rawQuery);
+  }
+
   async getCollections(rawQuery: Record<string, unknown> = {}): Promise<PaginatedResponse<Collection>> {
     const listQuery = parseListQuery(rawQuery, 'collection');
     const filters: Record<string, unknown>[] = [];

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { cloudinary } from 'config/cloudinary.config';
 import { Model } from 'mongoose';
@@ -114,6 +114,14 @@ export class ProductsService {
     );
 
     return collectionSummary ? { ...page, collection: collectionSummary } : page;
+  }
+
+  async search(rawQuery: Record<string, unknown> = {}): Promise<PaginatedResponse<Product>> {
+    const listQuery = parseListQuery(rawQuery, 'product');
+    if (!listQuery.q) {
+      throw new BadRequestException('Indiquez un terme de recherche');
+    }
+    return this.findPaginated(rawQuery);
   }
 
   async findAll(): Promise<Product[]> {

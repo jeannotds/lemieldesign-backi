@@ -21,6 +21,11 @@ export class ProductsController {
     return this.productsService.findPaginated(query);
   }
 
+  @Get('search')
+  async searchProducts(@Query() query: Record<string, unknown>) {
+    return this.productsService.search(query);
+  }
+
   @Get('collection/:collectionId')
   async findByCollection(
     @Param('collectionId') collectionId: string,
